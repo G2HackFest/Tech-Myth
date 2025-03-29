@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legal Document Analyzer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Legal Document Summarizer & Bias Detector</h1>
+
+    <form id="upload-form">
+        <label>Upload a Document:</label>
+        <input type="file" id="file-input" accept=".txt,.pdf,.docx">
+        
+        <label>Or Paste Text Below:</label>
+        <textarea id="text-input" rows="6" placeholder="Paste legal text here..."></textarea>
+        
+        <button type="submit">Analyze</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
