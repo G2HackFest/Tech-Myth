@@ -1,10 +1,12 @@
 from flask import Blueprint, request, jsonify
-from gemini_ai import analyze_document
+from gemini_ai import analyze_document, chat_with_ai
 import os
 import PyPDF2
 import docx
 
 routes = Blueprint("routes", __name__)
+
+user_context = {}  # Store user-specific document context
 
 def extract_text_from_file(file):
     """Extracts text from uploaded files based on file type."""
@@ -59,8 +61,32 @@ def analyze():
         # Analyze with Gemini AI
         result = analyze_document(content)
 
+        # Store document context for follow-up questions
+        user_context["text"] = content
+
         return jsonify({"message": "Analysis complete!", "data": result}), 200
 
     except Exception as e:
         print("Error:", str(e))  # Log errors
+        return jsonify({"error": str(e)}), 500
+
+@routes.route("/chat", methods=["POST"])
+def chat():
+    try:
+        data = request.json
+        user_query = data.get("query", "")
+
+        if not user_query:
+            return jsonify({"error": "No query provided!"}), 400
+
+        if "text" not in user_context:
+            return jsonify({"error": "No document context available. Please analyze a document first."}), 400
+
+        # Get AI response based on document context
+        response = chat_with_ai(user_query, user_context["text"])
+
+        return jsonify({"response": response}), 200
+
+    except Exception as e:
+        print("Error:", str(e))
         return jsonify({"error": str(e)}), 500
