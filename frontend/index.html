@@ -4,31 +4,498 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Legal Document Analyzer</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent: #3498db;
+            --light: #ecf0f1;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --text: #333;
+            --border-radius: 6px;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--text);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px 0;
+            box-shadow: var(--shadow);
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-icon {
+            margin-right: 15px;
+            font-size: 24px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            font-weight: 400;
+            margin-bottom: 30px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        main {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 40px 20px;
+        }
+        
+        @media (max-width: 768px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 30px;
+            transition: var(--transition);
+        }
+        
+        .card:hover {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-title i {
+            margin-right: 10px;
+            color: var(--accent);
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--secondary);
+        }
+        
+        .file-upload {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px;
+            border: 2px dashed #ccc;
+            border-radius: var(--border-radius);
+            background-color: #f9f9f9;
+            transition: var(--transition);
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        
+        .file-upload:hover {
+            border-color: var(--accent);
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+        
+        .file-upload i {
+            font-size: 40px;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+        
+        .file-upload input {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .or-divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .or-divider::before,
+        .or-divider::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: calc(50% - 30px);
+            height: 1px;
+            background-color: #ddd;
+        }
+        
+        .or-divider::before {
+            left: 0;
+        }
+        
+        .or-divider::after {
+            right: 0;
+        }
+        
+        .or-text {
+            display: inline-block;
+            padding: 0 15px;
+            background-color: white;
+            position: relative;
+            color: #999;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            resize: vertical;
+            min-height: 150px;
+            font-size: 15px;
+            transition: var(--transition);
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        button {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        button i {
+            margin-right: 8px;
+        }
+        
+        #result {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 0;
+            box-shadow: var(--shadow);
+            min-height: 200px;
+            transition: var(--transition);
+            overflow: hidden;
+        }
+        
+        .result-header {
+            background-color: var(--secondary);
+            color: white;
+            padding: 15px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .result-header i {
+            margin-right: 10px;
+        }
+        
+        .result-tabs {
+            display: flex;
+            background-color: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .result-tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+        
+        .result-tab.active {
+            background-color: white;
+            border-bottom: 3px solid var(--accent);
+            color: var(--accent);
+        }
+        
+        .result-content {
+            padding: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .result-section {
+            margin-bottom: 20px;
+        }
+        
+        .result-section-title {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+        }
+        
+        .result-section-title i {
+            margin-right: 8px;
+            color: var(--accent);
+        }
+        
+        .chip {
+            display: inline-block;
+            background-color: #e0e0e0;
+            padding: 5px 12px;
+            border-radius: 30px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .chat-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+        }
+        
+        .chat-header {
+            background-color: var(--secondary);
+            color: white;
+            padding: 15px;
+            font-weight: 500;
+        }
+        
+        .chat-box {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+        
+        .chat-message {
+            margin-bottom: 15px;
+            display: flex;
+        }
+        
+        .user-message {
+            flex-direction: row-reverse;
+        }
+        
+        .message-bubble {
+            max-width: 70%;
+            padding: 12px 15px;
+            border-radius: 18px;
+            position: relative;
+        }
+        
+        .user-message .message-bubble {
+            background-color: var(--accent);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .ai-message .message-bubble {
+            background-color: #e6e6e6;
+            color: var(--text);
+            border-bottom-left-radius: 4px;
+        }
+        
+        .chat-input-container {
+            display: flex;
+            padding: 15px;
+            background-color: white;
+            border-top: 1px solid #eee;
+        }
+        
+        .chat-input {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            font-size: 15px;
+            transition: var(--transition);
+        }
+        
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .chat-send {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            margin-left: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .chat-send:hover {
+            background-color: #2980b9;
+            transform: scale(1.05);
+        }
+        
+        /* Icons (using HTML entity codes or simple ASCII for demo) */
+        .icon {
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            font-style: normal;
+        }
+    </style>
 </head>
 <body>
-    <h1>Legal Document Summarizer & Bias Detector</h1>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div>
+                    <h1>Legal Document Analyzer</h1>
+                    <p class="subtitle">Smart analysis, summarization, and bias detection for legal documents</p>
+                </div>
+            </div>
+        </div>
+    </header>
 
-    <form id="upload-form">
-        <label>Upload a Document:</label>
-        <input type="file" id="file-input" accept=".txt,.pdf,.docx">
-        
-        <label>Or Paste Text Below:</label>
-        <textarea id="text-input" rows="6" placeholder="Paste legal text here..."></textarea>
-        
-        <button type="submit">Analyze</button>
-    </form>
-
-    <div id="result"></div>
-
-    <!-- Chat Section -->
-    <div id="chat-container" style="display: none;">
-        <h3>Ask Questions About the Document</h3>
-        <div id="chat-box"></div>
-        <input type="text" id="chat-input" placeholder="Ask a question..." />
-        <button id="chat-send">Send</button>
+    <div class="container">
+        <main>
+            <section class="card">
+                <h2 class="card-title"><span class="icon">📄</span> Document Input</h2>
+                
+                <form id="upload-form">
+                    <div class="form-group">
+                        <label for="file-input">Upload Document</label>
+                        <div class="file-upload">
+                            <span class="icon" style="font-size: 36px;">📎</span>
+                            <p>Drag & drop your file here</p>
+                            <p style="font-size: 14px; color: #888; margin-top: 8px;">Supports PDF, DOCX, and TXT formats</p>
+                            <input type="file" id="file-input" accept=".txt,.pdf,.docx">
+                        </div>
+                    </div>
+                    
+                    <div class="or-divider">
+                        <span class="or-text">OR</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="text-input">Paste Text</label>
+                        <textarea id="text-input" placeholder="Paste legal text here..."></textarea>
+                    </div>
+                    
+                    <button type="submit"><span class="icon">🔍</span> Analyze Document</button>
+                </form>
+            </section>
+            
+            <section>
+                <div id="result">
+                    <div class="result-header">
+                        <span><span class="icon">📊</span> Analysis Results</span>
+                    </div>
+                    
+                    <div class="result-tabs">
+                        <div class="result-tab active">Summary</div>
+                        <div class="result-tab"> </div>
+                        <div class="result-tab">Bias Detection</div>
+                    </div>
+                    
+                    <div class="result-content">
+                        <p style="color: #888; text-align: center; margin: 40px 0;">
+                            Upload a document or paste text to see analysis results
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="chat-container" style="margin-top: 30px;">
+                    <div class="chat-header">
+                        <span class="icon">💬</span> Ask Questions About Your Document
+                    </div>
+                    
+                    <div class="chat-box" id="chat-box">
+                        <div class="chat-message ai-message">
+                            <div class="message-bubble">
+                                Upload a document and I'll help you understand it. You can ask me questions about its content, implications, or potential issues.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-input-container">
+                        <input type="text" class="chat-input" id="chat-input" placeholder="Ask a question about your document..." disabled>
+                        <button class="chat-send" id="chat-send" disabled>➤</button>
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
-
+    
     <script src="script.js"></script>
 </body>
 </html>
